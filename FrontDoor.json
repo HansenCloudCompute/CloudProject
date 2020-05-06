@@ -1,0 +1,121 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "frontdoors_TeamJeff_name": {
+            "defaultValue": "TeamJeff",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/frontdoors",
+            "apiVersion": "2018-08-01",
+            "name": "[parameters('frontdoors_TeamJeff_name')]",
+            "location": "Global",
+            "properties": {
+                "resourceState": "Enabled",
+                "backendPools": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_TeamJeff_name')), '/BackendPools/TJEastUSBackend')]",
+                        "name": "TJEastUSBackend",
+                        "properties": {
+                            "backends": [
+                                {
+                                    "address": "teamjeffwebsite2.azurewebsites.net",
+                                    "httpPort": 80,
+                                    "httpsPort": 443,
+                                    "priority": 2,
+                                    "weight": 50,
+                                    "backendHostHeader": "teamjeffwebsite2.azurewebsites.net",
+                                    "enabledState": "Enabled"
+                                },
+                                {
+                                    "address": "teamjeffwordpresstest.azurewebsites.net",
+                                    "httpPort": 80,
+                                    "httpsPort": 443,
+                                    "priority": 1,
+                                    "weight": 50,
+                                    "backendHostHeader": "teamjeffwordpresstest.azurewebsites.net",
+                                    "enabledState": "Enabled"
+                                }
+                            ],
+                            "healthProbeSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_TeamJeff_name')), '/HealthProbeSettings/healthProbeSettings-1587584681100')]"
+                            },
+                            "loadBalancingSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_TeamJeff_name')), '/LoadBalancingSettings/loadBalancingSettings-1587584681100')]"
+                            },
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "healthProbeSettings": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_TeamJeff_name')), '/HealthProbeSettings/healthProbeSettings-1587584681100')]",
+                        "name": "healthProbeSettings-1587584681100",
+                        "properties": {
+                            "intervalInSeconds": 30,
+                            "path": "/",
+                            "protocol": "Https",
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "frontendEndpoints": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_TeamJeff_name')), concat('/FrontendEndpoints/', parameters('frontdoors_TeamJeff_name'), '-azurefd-net'))]",
+                        "name": "[concat(parameters('frontdoors_TeamJeff_name'), '-azurefd-net')]",
+                        "properties": {
+                            "hostName": "[concat(parameters('frontdoors_TeamJeff_name'), '.azurefd.net')]",
+                            "sessionAffinityEnabledState": "Disabled",
+                            "sessionAffinityTtlSeconds": 0,
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "loadBalancingSettings": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_TeamJeff_name')), '/LoadBalancingSettings/loadBalancingSettings-1587584681100')]",
+                        "name": "loadBalancingSettings-1587584681100",
+                        "properties": {
+                            "additionalLatencyMilliseconds": 0,
+                            "sampleSize": 4,
+                            "successfulSamplesRequired": 2,
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "routingRules": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_TeamJeff_name')), concat('/RoutingRules/', parameters('frontdoors_TeamJeff_name'), 'RR'))]",
+                        "name": "[concat(parameters('frontdoors_TeamJeff_name'), 'RR')]",
+                        "properties": {
+                            "frontendEndpoints": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_TeamJeff_name')), concat('/FrontendEndpoints/', parameters('frontdoors_TeamJeff_name'), '-azurefd-net'))]"
+                                }
+                            ],
+                            "acceptedProtocols": [
+                                "Http",
+                                "Https"
+                            ],
+                            "patternsToMatch": [
+                                "/*"
+                            ],
+                            "forwardingProtocol": "HttpsOnly",
+                            "backendPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_TeamJeff_name')), '/backendPools/TJEastUSBackend')]"
+                            },
+                            "enabledState": "Enabled",
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "enabledState": "Enabled",
+                "friendlyName": "[parameters('frontdoors_TeamJeff_name')]"
+            }
+        }
+    ]
+}
