@@ -1,0 +1,50 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "subscriptionId": {
+      "value": "63649433-6b85-41cf-be19-51faa19725f8"
+    },
+    "name": {
+      "value": "BlantonApp"
+    },
+    "location": {
+      "value": "East US"
+    },
+    "hostingEnvironment": {
+      "value": ""
+    },
+    "hostingPlanName": {
+      "value": "ASP-AzDeployments-9a73"
+    },
+    "serverFarmResourceGroup": {
+      "value": "AzDeployments"
+    },
+    "alwaysOn": {
+      "value": false
+    },
+    "sku": {
+      "value": "Free"
+    },
+    "skuCode": {
+      "value": "F1"
+    },
+    "workerSize": {
+      "value": "0"
+    },
+    "workerSizeId": {
+      "value": "0"
+    },
+    "numberOfWorkers": {
+      "value": "1"
+    },
+    "currentStack": {
+      "value": "dotnetcore"
+    },
+    "phpVersion": {
+      "value": "OFF"
+    },
+    "errorLink": {
+      "value": "https://BlantonApp.scm.azurewebsites.net/detectors?type=tools&name=eventviewer"
+    }
+  }

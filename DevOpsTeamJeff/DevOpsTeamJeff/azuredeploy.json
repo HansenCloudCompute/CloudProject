@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {
+    "TeamJeffVNetPrefix": "10.0.0.0/16",
+    "TeamJeffVNetSubnet1Name": "Subnet-1",
+    "TeamJeffVNetSubnet1Prefix": "10.0.0.0/24",
+    "TeamJeffVNetSubnet2Name": "Subnet-2",
+    "TeamJeffVNetSubnet2Prefix": "10.0.1.0/24"},
+  "resources": [
+    {
+      "name": "TeamJeffVNet",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "TeamJeffVNet"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('TeamJeffVNetPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('TeamJeffVNetSubnet1Name')]",
+            "properties": {
+              "addressPrefix": "[variables('TeamJeffVNetSubnet1Prefix')]"
+            }
+          },
+          {
+            "name": "[variables('TeamJeffVNetSubnet2Name')]",
+            "properties": {
+              "addressPrefix": "[variables('TeamJeffVNetSubnet2Prefix')]"
+            }
+          }
+        ]
+      }
+    }],
+  "outputs": {}
+}

@@ -1,0 +1,156 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sites_TeamJeffWordPressTest_name": {
+      "defaultValue": "TeamJeffWordPressTest",
+      "type": "String"
+    },
+    "serverfarms_F1FreeTeamJeff_externalid": {
+      "defaultValue": "/subscriptions/e7392181-4e5c-490b-995f-395051269a90/resourceGroups/TeamJeff-rg/providers/Microsoft.Web/serverfarms/F1FreeTeamJeff",
+      "type": "String"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-11-01",
+      "name": "[parameters('sites_TeamJeffWordPressTest_name')]",
+      "location": "East US",
+      "kind": "app",
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "teamjeffwordpresstest.azurewebsites.net",
+            "sslState": "Disabled",
+            "hostType": "Standard"
+          },
+          {
+            "name": "teamjeffwordpresstest.scm.azurewebsites.net",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
+        ],
+        "serverFarmId": "[parameters('serverfarms_F1FreeTeamJeff_externalid')]",
+        "reserved": false,
+        "isXenon": false,
+        "hyperV": false,
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": true,
+        "clientCertEnabled": false,
+        "hostNamesDisabled": false,
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": false,
+        "redundancyMode": "None"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2018-11-01",
+      "name": "[concat(parameters('sites_TeamJeffWordPressTest_name'), '/web')]",
+      "location": "East US",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('sites_TeamJeffWordPressTest_name'))]"
+      ],
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php",
+          "hostingstart.html"
+        ],
+        "netFrameworkVersion": "v4.0",
+        "phpVersion": "7.3",
+        "requestTracingEnabled": false,
+        "remoteDebuggingEnabled": false,
+        "remoteDebuggingVersion": "VS2019",
+        "httpLoggingEnabled": false,
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": false,
+        "publishingUsername": "$TeamJeffWordPressTest",
+        "scmType": "ExternalGit",
+        "use32BitWorkerProcess": true,
+        "webSocketsEnabled": false,
+        "alwaysOn": false,
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
+          {
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": false
+          }
+        ],
+        "loadBalancing": "LeastRequests",
+        "experiments": {
+          "rampUpRules": []
+        },
+        "autoHealEnabled": false,
+        "localMySqlEnabled": true,
+        "ipSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 1,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 1,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictionsUseMain": false,
+        "http20Enabled": false,
+        "minTlsVersion": "1.2",
+        "ftpsState": "AllAllowed",
+        "reservedInstanceCount": 0
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/deployments",
+      "apiVersion": "2018-11-01",
+      "name": "[concat(parameters('sites_TeamJeffWordPressTest_name'), '/aac1d7d9bf6f05fd9a96b3b21542e749bf3ea763')]",
+      "location": "East US",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('sites_TeamJeffWordPressTest_name'))]"
+      ],
+      "properties": {
+        "status": 4,
+        "author_email": "jennylaw@microsoft.com",
+        "author": "JennyLawrance",
+        "deployer": "GitHub",
+        "message": "Merge pull request #102 from azureappserviceoss/revert-96-5.2.4-windows-wp\n\nRevert \"New version of wordpress,version is 5.2.4\"",
+        "start_time": "2020-04-21T20:02:13.2778755Z",
+        "end_time": "2020-04-21T20:02:44.7394907Z",
+        "active": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2018-11-01",
+      "name": "[concat(parameters('sites_TeamJeffWordPressTest_name'), '/', parameters('sites_TeamJeffWordPressTest_name'), '.azurewebsites.net')]",
+      "location": "East US",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('sites_TeamJeffWordPressTest_name'))]"
+      ],
+      "properties": {
+        "siteName": "TeamJeffWordPressTest",
+        "hostNameType": "Verified"
+      }
+    }
+  ],
+  "variables": {}
+}
