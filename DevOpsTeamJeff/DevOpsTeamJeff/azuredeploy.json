@@ -1,13 +1,51 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {},
+  "parameters": {
+    "WebPlanName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "WebPlanSkuName": {
+      "type": "string",
+      "defaultValue": "F1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "TeamJeffBlobType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
+    }},
   "variables": {
     "TeamJeffVNetPrefix": "10.0.0.0/16",
     "TeamJeffVNetSubnet1Name": "Subnet-1",
     "TeamJeffVNetSubnet1Prefix": "10.0.0.0/24",
     "TeamJeffVNetSubnet2Name": "Subnet-2",
-    "TeamJeffVNetSubnet2Prefix": "10.0.1.0/24"},
+    "TeamJeffVNetSubnet2Prefix": "10.0.1.0/24",
+    "WebAppHansenProjectName": "[concat('WebAppHansenProject', uniqueString(resourceGroup().id))]",
+    "TeamJeffBlobName": "[concat('TeamJeffBlob', uniqueString(resourceGroup().id))]"},
   "resources": [
     {
       "name": "TeamJeffVNet",
@@ -39,6 +77,135 @@
           }
         ]
       }
+    },
+    {
+      "name": "[parameters('WebPlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "sku": {
+        "name": "[parameters('WebPlanSkuName')]"
+      },
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "WebPlan"
+      },
+      "properties": {
+        "name": "[parameters('WebPlanName')]",
+        "numberOfWorkers": 1
+      }
+    },
+    {
+      "name": "[variables('WebAppHansenProjectName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('WebPlanName'))]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', parameters('WebPlanName')))]": "Resource",
+        "displayName": "WebAppHansenProject"
+      },
+      "properties": {
+        "name": "[variables('WebAppHansenProjectName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('WebPlanName'))]"
+      }
+    },
+    {
+      "name": "[concat(parameters('WebPlanName'), '-', resourceGroup().name)]",
+      "type": "Microsoft.Insights/autoscalesettings",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2014-04-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('WebPlanName'))]"
+      ],
+      "tags": {
+        "[concat('hidden-link:', resourceId('Microsoft.Web/serverfarms', parameters('WebPlanName')))]": "Resource",
+        "displayName": "TeamJeffInsight AutoScale"
+      },
+      "properties": {
+        "name": "[concat(parameters('WebPlanName'), '-', resourceGroup().name)]",
+        "profiles": [
+          {
+            "name": "Default",
+            "capacity": {
+              "minimum": 1,
+              "maximum": 2,
+              "default": 1
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', parameters('WebPlanName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT10M",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": 80
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT10M"
+                }
+              },
+              {
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', parameters('WebPlanName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT1H",
+                  "timeAggregation": "Average",
+                  "operator": "LessThan",
+                  "threshold": 60
+                },
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT1H"
+                }
+              }
+            ]
+          }
+        ],
+        "enabled": false,
+        "targetResourceUri": "[resourceId('Microsoft.Web/serverfarms', parameters('WebPlanName'))]"
+      }
+    },
+    {
+      "name": "TeamJeffInsight",
+      "type": "Microsoft.Insights/components",
+      "location": "East US",
+      "apiVersion": "2014-04-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('WebAppHansenProjectName'))]"
+      ],
+      "tags": {
+        "displayName": "Component TeamJeffInsight"
+      },
+      "properties": {
+        "applicationId": "[resourceId('Microsoft.Web/sites', variables('WebAppHansenProjectName'))]"
+      }
+    },
+    {
+      "name": "[variables('TeamJeffBlobName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "[parameters('TeamJeffBlobType')]"
+      },
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "TeamJeffBlob"
+      },
+      "kind": "Storage"
     }],
   "outputs": {}
 }
