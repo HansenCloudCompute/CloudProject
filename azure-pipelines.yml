@@ -1,19 +1,11 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-trigger:
-- master
-
-pool:
-  vmImage: 'ubuntu-latest'
-
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'Azure for Students (e0117a90-c0d0-49ab-8e8b-6e80fdf13035)'
+    subscriptionId: 'e0117a90-c0d0-49ab-8e8b-6e80fdf13035'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'AppPipeline'
+    location: 'East US'
+    templateLocation: 'URL of the file'
+    csmFileLink: 'https://github.com/HansenCloudCompute/CloudProject/blob/master/VNet.json'
+    deploymentMode: 'Incremental'
